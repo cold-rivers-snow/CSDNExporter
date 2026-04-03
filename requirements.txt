@@ -1,4 +1,6 @@
 requests
-BeautifulSoup
+beautifulsoup4
 httpx
 bs4
+markdown2
+playwright

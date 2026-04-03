@@ -3,12 +3,12 @@
 
 set download_category="true"
 set download_article="false"
-set userName="Zero___0_0"
+set userName="weixin_43980547"
 set start_page=1
 set page_num=100
 set markdown_dir=markdown
 set pdf_dir=pdf
-set article_url="https://blog.csdn.net/weixin_57165154/article/details/124131932"
+set article_url="https://blog.csdn.net/weixin_43980547/article/details/137085690"
 
 if %download_category% == "true" (
   echo "Obtain blog directory link: save in userName.txt........"

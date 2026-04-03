@@ -6,12 +6,12 @@ import time
 # java_t_t
 download_category = True
 download_article = False
-userName = "java_t_t"
+userName = "weixin_43980547"
 start_page = 1
 page_num = 100
 markdown_dir = "markdown"
 pdf_dir = "pdf"
-article_url = "https://blog.csdn.net/weixin_57165154/article/details/124131932"
+article_url = "https://blog.csdn.net/weixin_43980547/article/details/137085690"
 
 time_start = time.time()
 if download_category:

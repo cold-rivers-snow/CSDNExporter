@@ -1,157 +1,62 @@
 # CSDNExporter
-## 介绍
-CSDN 博客导出工具, 用于将 CSDN 博客导出为 Markdown / PDF 格式. 比较赞的地方在于, 它
-不仅支持一篇博文的导出, 还支持将某个类目下的博文批量导出, 以及将导出的多篇博文汇总为
-一篇, 以便用于全局搜索, 具体效果可以查看 .
 
-## 运行脚本
-- Linux系统运行
-启动脚本为 `./run.sh`, 使用 `chmod +x run.sh` 增加其可执行权限;(并没有测试)
-- Windows系统启动
-启动脚本为`run.bat`, 双击打开或者在cmd中运行`run.bat`。
+将 CSDN 博客导出为 Markdown / PDF 格式的工具。
 
-## 修改的地方
+## 功能特性
 
-1、将下载的博客的图片分开保存在title..assets文件中，博客中有图片的时候才会创建图片目录，只会创建一次
+- ✅ 下载 CSDN 单篇文章或整个分类
+- ✅ 支持图片下载和嵌入
+- ✅ 转换为 PDF（支持中文和图片）
+- ✅ 批量导出
 
-utils.py 增加了一个参数title
-
-```python
-def __init__(self, html, title, is_win=True):
-    self.html = html
-    self.soup = BeautifulSoup(html, 'html.parser')
-    self.outputs = []
-    self.fig_dir = f'./figures/{title}'+'.assets'
-    self.pre = False
-    self.equ_inline = False
-    self.is_win = is_win
-
-    self.recursive(self.soup)
-```
-
-recursive(self, soup):
-
-```python
-def recursive(self, soup):
-    …………
-    elif tag == 'img':
-        if not exists(self.fig_dir): # 博客中有图片的时候才会创建图片目录，只会创建一次
-            os.makedirs(self.fig_dir)
-    …………
-```
-
-2、输入用户名就可以直接找到的用户的博客专栏，拿到所有专栏下面的文章
-
-run.bat 先将所有的categories保存在userName.txt中
+## 安装
 
 ```bash
-if %download_category% == "true" (
-  echo "Obtain blog directory link: save in userName.txt........"
-  python -u link.py %userName%
-)
+pip install -r requirements.txt
+python -m playwright install chromium
 ```
 
-再读取userName.txt文件的链接
+## 快速开始
+
+### 1. 下载 CSDN 文章
 
 ```bash
-for /f "tokens=* delims=" %%a in (m0_67623521.txt) do (
-  echo %%a
-  if %download_category% == "true" (
-      echo "Download a category"
-      python -u main.py ^
-          --category_url %%a ^
-          --start_page %start_page% ^
-          --page_num %page_num% ^
-          --markdown_dir %markdown_dir% ^
-          --pdf_dir %pdf_dir% ^
-          --combine_together ^
-          --to_pdf ^
-          --is_win 1
-          @REM --with_title ^
-          @REM --rm_cache
-   )
-)
+# 下载单篇文章
+python main.py --article_url https://blog.csdn.net/weixin_43980547/article/details/137085690
+
+# 下载整个分类
+python main.py --category_url https://blog.csdn.net/xxx/category_xxx.html --page_num 10
 ```
 
-link.py
+### 2. 转换为 PDF
 
-```python
-user = sys.argv[1] # 拿到命令行下的用户名参数
+```bash
+# Markdown 转 PDF（推荐，带图片）
+python md_to_pdf.py --input markdown/你的文章.md
+
+# 指定输出文件
+python md_to_pdf.py --input markdown/文章.md --output output.pdf
 ```
 
-将连接写入文件
+## 输出目录
 
-```python
-for li in lis:
-    # print("####")
-    url = li.find("a").attrs['href']
-    title = li.find("span").attrs['title']
-    titles.append(title)
-    infos[title] = {"url":url}
-
-    # print("[+]"+title+url)
-    with open(user+'.txt','a+') as f:    #设置文件对象
-        f.write(url)
-        f.write('\n')
+```
+CSDNExporter/
+├── markdown/          # 下载的 Markdown 文件
+├── figures/           # 下载的图片
+└── *.pdf             # 生成的 PDF 文件
 ```
 
-## 补充
+## 依赖
 
-另外要说明的是:
+- Python 3.8+
+- requests, beautifulsoup4, httpx, bs4
+- markdown2, playwright
 
-0. 安装必要的 Python 库, 如 `httpx`, `requests`, `BeautifulSoup`, `bs4`;
-1. 为了解析图片链接, 需要安装 [aria2](https://aria2.github.io/), 并保证能在命令行启动;
-2. 为了转换为 PDF, 需要安装 [Pandoc](https://pandoc.org/)，(博主该功能我并没有测试)。
-3. 该博客导出工具再我的需求下就是拿到md文件，现在的功能我还是比较满意
+## License
 
-## 对于安装aria2的问题
+MIT
 
-我参考了以下博文：
+# Reference
 
-[电脑Windows安装Aria2配置详细教程全能的下载神器](https://blog.csdn.net/weizuer123/article/details/127411328)
-
-[Aria2小白入门级部署](https://www.bilibili.com/read/cv21314846?from=search)
-
-[超简单的Aria2使用教程](https://tomford1986.blogspot.com/2018/01/aria2.html)
-
-[Aria2傻瓜安装部署指南](https://controlnet.space/2021/06/08/note/aria2-setup/)
-
-[Aria2 & YAAW 使用说明](http://aria2c.com/usage.html)
-
-如果想要下载配置好的aria2，可以在CSDN私聊[我的博客](https://blog.csdn.net/m0_67623521?type=blog) 。
-
-## Author
-
-[allenmirac-CSDNExporter](https://github.com/allenmirac/CSDNExporter)
-
-## 使用方法
-
-1、获取作者的作用文章
-
-
-打开作者主页，看到浏览器上面的链接框，比如：https://blog.csdn.net/m0_67623521?type=blog， 这样就可以把m0_67623521用户名提取出来，然后修改run.py，新建userName.txt，用于保存目录链接，之后就会自动下载博客，并且下载图片保存下来
-
-此时：
-```python
-download_category = True
-download_article = False
-```
-
-
-2、获取一篇文章
-
-直接修改run.py的article_url 改为你要获取的文章，
-
-此时：
-```python
-download_category = True
-download_article = False
-```
-
-# 巨人的肩膀
-
-[axzml-CSDNExporter](https://github.com/axzml/CSDNExporter)
-
-[导出 CSDN 博客至 Markdown 或 PDF 格式 (近乎完美)](https://blog.csdn.net/Eric_1993/article/details/104772437)
-
-[获取指定博主所有专栏链接及博文链接](https://blog.csdn.net/qq_53381910/article/details/130816856)
+- [axzml-CSDNExporter](https://github.com/axzml/CSDNExporter)

@@ -38,9 +38,10 @@ class Parser(object):
     def recursive(self, soup):
         if isinstance(soup, Comment): return
         elif isinstance(soup, NavigableString):
+            new_str = str(soup)
             for key, val in special_characters.items():
-                soup.string = soup.string.replace(key, val)
-            self.outputs.append(soup.string)
+                new_str = new_str.replace(key, val)
+            self.outputs.append(new_str)
         elif isinstance(soup, Tag):
             tag = soup.name
             if tag in ['h1', 'h2', 'h3', 'h4', 'h5']:
