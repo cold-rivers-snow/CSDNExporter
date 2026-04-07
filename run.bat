@@ -1,58 +1,65 @@
 @echo off
-@title CSDNExporter
+@title BlogExporter
 
-set download_category="true"
-set download_article="false"
-set userName="weixin_43980547"
-set start_page=1
-set page_num=100
-set markdown_dir=markdown
-set pdf_dir=pdf
-set article_url="https://blog.csdn.net/weixin_43980547/article/details/137085690"
+set "article_url="
+set "category_url="
+set "to_pdf="
+set "markdown_dir=markdown"
+set "pdf_dir=pdf"
 
-if %download_category% == "true" (
-  echo "Obtain blog directory link: save in userName.txt........"
-  python -u link.py %userName%
+:parse_args
+if "%~1"=="" goto done
+if /i "%~1"=="--article_url" set "article_url=%~2" & shift & shift & goto parse_args
+if /i "%~1"=="--category_url" set "category_url=%~2" & shift & shift & goto parse_args
+if /i "%~1"=="--to_pdf" set "to_pdf=1" & shift & goto parse_args
+if /i "%~1"=="--markdown_dir" set "markdown_dir=%~2" & shift & shift & goto parse_args
+if /i "%~1"=="--pdf_dir" set "pdf_dir=%~2" & shift & shift & goto parse_args
+if /i "%~1"=="--site" set "site=%~2" & shift & shift & goto parse_args
+if /i "%~1"=="--help" goto help
+shift
+goto parse_args
+
+:done
+if "%article_url%"=="" if "%category_url%"==" goto help
+
+echo ========================================
+echo BlogExporter - 博客文章导出工具
+echo ========================================
+echo.
+
+if not "%category_url%"=="" (
+    echo Download category: %category_url%
+    python -u main.py --category_url "%category_url%" --markdown_dir %markdown_dir% --pdf_dir %pdf_dir% --is_win 1 %to_pdf%
+) else (
+    echo Download article: %article_url%
+    python -u main.py --article_url "%article_url%" --markdown_dir %markdown_dir% --pdf_dir %pdf_dir% --is_win 1 %to_pdf%
 )
+echo.
+echo Done!
+pause
+exit /b
 
-for /f "tokens=* delims=" %%a in (Zero___0_0_categoty_link.txt) do (
-  @REM echo %%a
-  if %download_category% == "true" (
-      echo "Download a category"
-      python -u main.py ^
-          --category_url %%a ^
-          --start_page %start_page% ^
-          --page_num %page_num% ^
-          --markdown_dir %markdown_dir% ^
-          --pdf_dir %pdf_dir% ^
-          --combine_together ^
-          --is_win 1
-          @REM --to_pdf ^
-          @REM --with_title ^
-          @REM --rm_cache
-   )
-)
-
-@REM if %download_article% == "true" (
-@REM   echo "Download an article"
-@REM   python -u main.py ^
-@REM       --article_url %article_url% ^
-@REM       --markdown_dir %markdown_dir% ^
-@REM       --pdf_dir %pdf_dir% 
-@REM       --to_pdf ^
-@REM       --with_title ^
-@REM       --rm_cache ^
-@REM       --combine_together
-@REM       --is_win 1
-@REM )
-
-if %download_article% == "true" (
-  echo "Download an article"
-  python -u main.py ^
-      --article_url %article_url% ^
-      --markdown_dir %markdown_dir% ^
-      --with_title ^
-      --rm_cache ^
-      --is_win 1
-)
+:help
+echo ========================================
+echo BlogExporter - 博客文章导出工具
+echo ========================================
+echo.
+echo Usage:
+echo   run.bat --article_url ^<URL^> [options]
+echo   run.bat --category_url ^<URL^> [options]
+echo.
+echo Options:
+echo   --article_url    Article URL (博客文章地址)
+echo   --category_url  Category URL (博客分类地址)
+echo   --to_pdf         Convert to PDF (转换为PDF)
+echo   --markdown_dir   Output directory (默认: markdown)
+echo   --pdf_dir        PDF output directory (默认: pdf)
+echo   --site           Site parser (auto 自动检测)
+echo   --help           Show this help
+echo.
+echo Examples:
+echo   run.bat --article_url "https://blog.csdn.net/xxx/article/details/xxx"
+echo   run.bat --article_url "https://www.cnblogs.com/xxx/p/xxx" --to_pdf
+echo   run.bat --category_url "https://blog.csdn.net/xxx/category_xxx.html" --markdown_dir myblog
+echo.
 pause
