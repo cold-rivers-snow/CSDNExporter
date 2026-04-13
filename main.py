@@ -123,37 +123,47 @@ def generate_pdf(input_md_file, pdf_dir, is_win=True):
     md_name = os.path.basename(input_md_file)
     pdf_name = md_name.replace('.md', '.pdf')
     pdf_file = join(pdf_dir, pdf_name)
-    if is_win:
-        cmd = ['pandoc',
-            '--toc',
-            '--pdf-engine=xelatex',
-            '-V mainfont="Source Code Pro"',
-            '-V monofont="Source Code Pro"',
-            '-V documentclass="ctexbook"',
-            '-V geometry:"top=2cm, bottom=1cm, left=1.5cm, right=1.5cm"',
-            '-V pagestyle=plain',
-            '-V fontsize=11pt',
-            '-V colorlinks=blue',
-            '-s {}'.format(input_md_file),
-            '-o {}'.format(pdf_file),
-        ]
-    else:
-        cmd = ["pandoc",
-            "--toc",
-            "--pdf-engine=xelatex",
-            "-V mainfont='Source Code Pro'",
-            "-V monofont='Source Code Pro'",
-            "-V documentclass='ctexart'",
-            "-V geometry:'top=2cm, bottom=1cm, left=1.5cm, right=1.5cm'",
-            "-V pagestyle=plain",
-            "-V fontsize=11pt",
-            "-V colorlinks=blue",
-            "-s {}".format(input_md_file),
-            "-o {}".format(pdf_file),
-        ]
-    cmd = ' '.join(cmd)
+    
     print('Generate PDF File: {}'.format(pdf_file))
-    os.system(cmd)
+    
+    try:
+        import md_to_pdf
+        import asyncio
+        asyncio.run(md_to_pdf.md_to_pdf_async(input_md_file, pdf_file))
+    except Exception as e:
+        print(f'PDF generation failed: {e}')
+        print('Trying pandoc method...')
+        
+        if is_win:
+            cmd = ['pandoc',
+                '--toc',
+                '--pdf-engine=xelatex',
+                '-V mainfont="Source Code Pro"',
+                '-V monofont="Source Code Pro"',
+                '-V documentclass="ctexbook"',
+                '-V geometry:"top=2cm, bottom=1cm, left=1.5cm, right=1.5cm"',
+                '-V pagestyle=plain',
+                '-V fontsize=11pt',
+                '-V colorlinks=blue',
+                '-s {}'.format(input_md_file),
+                '-o {}'.format(pdf_file),
+            ]
+        else:
+            cmd = ["pandoc",
+                "--toc",
+                "--pdf-engine=xelatex",
+                "-V mainfont='Source Code Pro'",
+                "-V monofont='Source Code Pro'",
+                "-V documentclass='ctexart'",
+                "-V geometry:'top=2cm, bottom=1cm, left=1.5cm, right=1.5cm'",
+                "-V pagestyle=plain",
+                "-V fontsize=11pt",
+                "-V colorlinks=blue",
+                "-s {}".format(input_md_file),
+                "-o {}".format(pdf_file),
+            ]
+        cmd = ' '.join(cmd)
+        os.system(cmd)
 
 
 def get_category_article_info(soup):
@@ -255,11 +265,17 @@ if __name__ == '__main__':
         download_category_url(args.category_url,
                                md_dir,
                                start_page=args.start_page,
-                               page_num=args.page_num)
+                               page_num=args.page_num,
+                               pdf_dir=args.pdf_dir,
+                               to_pdf=args.to_pdf,
+                               is_win=is_win)
     else:
         download_single_page(args.article_url,
                               md_dir,
-                              with_title=args.with_title)
+                              with_title=args.with_title,
+                              pdf_dir=args.pdf_dir,
+                              to_pdf=args.to_pdf,
+                              is_win=is_win)
     
     if args.combine_together:
         source_files = join(args.markdown_dir, '*.md')
