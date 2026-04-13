@@ -22,6 +22,7 @@
 | 腾讯云 | cloud.tencent.com | ✅ |
 | 美团技术 | tech.meituan.com | ✅ |
 | CloudFlare Blog | blog.cloudflare.com | ✅ |
+| 博客园 | cnblogs.com | ✅ |
 | Lofter | lofter.com | ✅ |
 | 飞书文档 | feishu.cn | ✅ |
 | 微信公众号 | mp.weixin.qq.com | ✅ |
@@ -39,7 +40,7 @@ python -m playwright install chromium
 
 ## 快速开始
 
-### 1. 使用 run.py / run.sh / run.bat（推荐）
+### 1. 使用 run 脚本（推荐）
 
 ```bash
 # Windows
@@ -52,6 +53,16 @@ python run.py --article_url "URL"
 
 # 下载整个分类
 python run.py --category_url "https://blog.csdn.net/xxx/category_xxx.html"
+
+# 指定博客平台
+run.py --article_url "URL" --site cnblogs
+run.py --article_url "URL" --site csdn
+
+# 转换为PDF
+run.py --article_url "URL" --to_pdf
+
+# 自定义输出目录
+run.py --article_url "URL" --markdown_dir myblog --pdf_dir mypdf
 ```
 
 ### 2. 直接使用 main.py
@@ -63,6 +74,18 @@ python main.py --article_url https://blog.csdn.net/xxx/article/details/xxx
 # 下载整个分类
 python main.py --category_url https://blog.csdn.net/xxx/category_xxx.html --page_num 10
 ```
+
+### run 脚本参数说明
+
+| 参数 | 说明 | 示例 |
+|------|------|------|
+| `--article_url` | 文章URL | `--article_url "https://..."` |
+| `--category_url` | 分类URL | `--category_url "https://..."` |
+| `--to_pdf` | 转换为PDF | `--to_pdf` |
+| `--markdown_dir` | Markdown输出目录 | `--markdown_dir myblog` |
+| `--pdf_dir` | PDF输出目录 | `--pdf_dir mypdf` |
+| `--site` | 指定博客平台 | `--site cnblogs` |
+| `--help` | 显示帮助 | `--help` |
 
 ### 2. 指定平台下载
 
@@ -119,6 +142,9 @@ python md_to_pdf.py --input markdown/文章.md --output output.pdf
 # CSDN
 python main.py --article_url https://blog.csdn.net/xxx/article/details/xxx
 
+# 博客园
+python main.py --article_url https://www.cnblogs.com/xxx/p/xxx
+
 # 简书
 python main.py --article_url https://www.jianshu.com/p/xxx
 
@@ -168,6 +194,7 @@ parsers/
 ├── base.py            # 抽象基类 SiteParser
 ├── factory.py         # 解析器工厂
 ├── csdn.py            # CSDN 解析器
+├── cnblogs.py         # 博客园解析器
 ├── jianshu.py         # 简书解析器
 ├── segmentfault.py    # SegmentFault 解析器
 ├── oschina.py         # 开源中国解析器
